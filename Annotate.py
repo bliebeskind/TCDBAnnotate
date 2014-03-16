@@ -2,17 +2,11 @@
 
 import sys, os
 import fasta_channel_families
-
-## Current bugs:
-## 	to_fasta won't work for certain files because if no hits for a given
-##	gene family are found, to_tsv will still write an empty file, and this
-## 	chokes pandas parser. Need to re-write to_tsv to not write empty files.
-## 	Can do this by not being so fastidious with writing to streams and just
-##	build up a dictionary before writing, or something like that.
+import pandas as pd
+import csv
 
 ## To do: 
-## See notes on to_tsvs and other below
-## Would be nice not to have to write tsvs before fastas
+## Would be nice not to have to write tsvs before fastas (see notes below)
 ## Could modify to_tsv to take in pickle files optionally, since 
 ## 	blast_annotation writes these.
 
@@ -157,24 +151,34 @@ class TCDBAnnotate:
 					# and use this code:
 					#raise Exception("%s not found in schema" % tcdb_id)
 					
-	# One problem with this comes from opening the files as "append."
-	# If the user wants to add more gens and re-run, the files already
-	# created will have duplicates added.
+	def _gene_annotation_D(self,infile,gene_list):
+		'''Call _gene_generator and make a dictionary that maps gene names
+		to list of lines from original annotation file that have these genes.'''
+		gene_D = {gene:["\t".join(["Query","Uniprot Id","TCDB Id","Title\n"])]\
+			for gene in gene_list}
+		for line,gene in self._gene_generator(infile,gene_list):
+			assert gene in gene_D, "Parsing problem: %s" % gene
+			gene_D[gene].append(line)
+		return gene_D
+					
 	def to_tsv(self, infile, gene_list=None):
 		'''Write separate tsv files for each gene in gene_list. 
 		Infile: a *tsv* file output by blast_annotation.py
 		'''
 		if gene_list == None:
 			gene_list = self.genes
-		file_D = {gene:open(gene+'.tsv','a') for gene in gene_list}
-		for line,gene in self._gene_generator(infile,gene_list):
-			assert gene in gene_list, "Parsing problem: %s" % gene
-			outfile = file_D[gene]
-			outfile.write(line)
-		for gene in file_D.keys():
-			file_D[gene].close()
+		gene_D = self._gene_annotation_D(infile,gene_list)
+		for gene,L in gene_D.iteritems():
+			if len(L) == 1: # no hits found for gene (only header line)
+				continue
+			with open(gene+'.tsv','w') as outfile:
+				outfile.write("".join(L))
 			
-	def to_fasta(self,annot_file,fasta_file,gene_list=None):
+	# Currently works but would be nice not to have to write
+	# tsv files first. Could maybe pickle the information?
+	def to_fasta(self,fasta_file,gene_list=None):
+		'''Take a fasta file that of queries that were annotated and separate
+		into fasta files by gene in gene_list.'''
 		if gene_list == None:
 			gene_list = self.genes
 		fasta_channel_families.make_fasta_files(fasta_file,gene_list)

@@ -10,7 +10,7 @@ def get_pickled_hits(infile):
 		return pickle.load(f)
 
 def walk():
-	'''Return list of tupbles from os.walk'''
+	'''Return list of tuples from os.walk'''
 	return [i for i in os.walk(".")]
 		
 def path_to_file(name,walk):

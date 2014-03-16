@@ -8,13 +8,11 @@ from Bio import SeqIO
 def get_genes(infile, gene_family):
 	'''
 	Infile is tab separated tsv files made by annotate.py,
-	and then separated by TCDBAnnotate.to_tsv. Tsv should
-	not therefore have a header. Return dictionary of gene 
+	and then separated by TCDBAnnotate.to_tsv. Return dictionary of gene 
 	names (first column) mapped to the name of their gene family.
 	'''
-	df = pd.read_table(infile,sep='\t',header=None)
-	assert df.ix[0][0] != 'Query', "tsvs must not have headers"
-	return {i: str(gene_family) for i in df[0]}
+	df = pd.read_table(infile,sep='\t')
+	return {i: str(gene_family) for i in df["Query"]}
 	
 def make_gene_D(gene_list):
 	'''Given list of gene family names, call gene_D and concatenate
@@ -25,9 +23,9 @@ def make_gene_D(gene_list):
 		try:
 			with open(d+'.tsv') as f:
 				gene_D.update(get_genes(f,d))
+				family_count +=1
 		except IOError:
 			sys.stderr.write("No file called %s\n" % d)	
-		family_count +=1
 	print "Found %i gene families" % family_count
 	return gene_D
 	
