@@ -55,7 +55,8 @@ def make_out_D(infile, gene_list):
 
 def make_fasta_files(infile, gene_list):
 	'''Take fasta infile and separate sequences into different families
-	in gene list. Must have separate tsv files in directory made by '''
+	in gene list. Must have separate tsv files in directory made by 
+	TCDBAnnotate.to_tsv'''
 	out_D = make_out_D(infile, gene_list)
 	total_seqs = 0
 	total_families = 0

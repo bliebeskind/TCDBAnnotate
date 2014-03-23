@@ -7,8 +7,13 @@ import csv
 
 ## To do: 
 ## Would be nice not to have to write tsvs before fastas (see notes below)
+##
 ## Could modify to_tsv to take in pickle files optionally, since 
-## 	blast_annotation writes these.
+## blast_annotation writes these.
+##
+## Another idea for later is to have a field that holds counts of each
+## type of gene for each species for later use with ancestral gene count
+## reconstruction programs that use this information instead of trees.
 
 tcdb_id_map = {"1.A.1.1": "KcsA",
 		"1.A.1.2": "Kv",
@@ -85,7 +90,7 @@ class TCDBAnnotate:
 	
 	  ## Write out tsv and fasta files for all appended genes ##
 		>>> a.to_tsv("my_annotation.tsv") # infile is blast_annotation output
-		>>> a.to_fasta("my_annotation.tsv","my_fasta.fas")
+		>>> a.to_fasta("my_fasta.fas")
 		>>> ## Where 'my_fasta' is query file used for annotation.
 	'''
 	
