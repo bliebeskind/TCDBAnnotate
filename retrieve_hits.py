@@ -4,14 +4,18 @@ import os,sys
 import cPickle as pickle
 from Bio import SeqIO
 
+## This needs to be fixed, it's way too ugly now. Find a better (not ad hoc)
+## way of supplying the path to the fasta files. Also maybe make it work as a
+## stream output instead of building a SeqRecord list.
+
 def get_pickled_hits(infile):
 	'''Load in dictionary made with hits_pickler'''
 	with open(infile) as f:
 		return pickle.load(f)
 
-def walk():
+def walk(start="."):
 	'''Return list of tuples from os.walk'''
-	return [i for i in os.walk(".")]
+	return [i for i in os.walk(start)]
 		
 def path_to_file(name,walk):
 	'''Returns list where sole entry is path to file that starts with "name"'''
@@ -38,19 +42,28 @@ def get_hits(path, hits):
 	assert len(outrecs) == len(hits), "Didn't find all the hits"
 	return outrecs
 		
-def hits_from_files(D):
+def hits_from_files(D,path_to_fastas=None):
 	'''Make and return list of fasta SeqIO objects from dictionary D made with 
 	hits_pickler.'''
 	all_hits = []
-	pathwalk = walk()
 	for key in D.keys():
-		filepath = path_to_file(key,pathwalk)
-		new_hits = get_hits(filepath[0],D[key])
+		if path_to_fastas:
+			pathwalk = walk(path_to_fastas)
+			filepath = path_to_file(key,pathwalk)
+			new_hits = get_hits(filepath[0],D[key])
+		else:
+			filepath = path_to_file(key,pathwalk)
+			new_hits = get_hits(filepath[0],D[key])
 		all_hits += new_hits
-	return all_hits
+	return sorted(all_hits)
 	
 if __name__ == '__main__':
 	infile = sys.argv[1]
+	outfile = sys.argv[2]
+	try:
+		path_to_fastas = sys.argv[3]
+	except IndexError:
+		path_to_fastas = None
 	pickled_hits = get_pickled_hits(infile)
 	species = 0
 	hits = 0
@@ -59,7 +72,8 @@ if __name__ == '__main__':
 		hits += len(pickled_hits[k].keys())
 	sys.stderr.write("%i total species\n" % species)
 	sys.stderr.write("%i total hits\n" % hits)
-	all_hits = hits_from_files(pickled_hits)
+	if path_to_fastas:
+		all_hits = hits_from_files(pickled_hits,path_to_fastas)
 	assert len(all_hits) == hits
 	sys.stderr.write("Found all the hits!\n")
-	SeqIO.write(all_hits,'testout.fas','fasta')
+	SeqIO.write(all_hits,outfile,'fasta')

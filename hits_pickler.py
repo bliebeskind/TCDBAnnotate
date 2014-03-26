@@ -3,9 +3,21 @@
 import sys, re
 from pprint import pprint as pp
 
+## For parsing hmmsearch output. Dumps a pickled object of the following format:
+## {species1:
+##		{hit1:	# where hit is fasta ID
+##			(evalue,domain_number),
+##		 hit2:
+##			(evalue,domain_number)
+##		},
+##	 species 2 ...etc.
+##	}
+##
+## Might be nice to include information on which file the output came from
+
 def parse(infile, cutoff):
-	'''Return dictionary of hits better than cutoff mapped to e-values and 
-	number of predicted domains, as a tuple.'''
+	'''From hmmesearch output file, return dictionary of hits better than 
+	cutoff mapped to e-values and number of predicted domains, as a tuple.'''
 	D = {}
 	with open(infile) as f:
 		for line in f:
