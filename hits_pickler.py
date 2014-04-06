@@ -3,6 +3,10 @@
 import sys, re
 from pprint import pprint as pp
 
+## Usage: hits_pickler <infile> <outfile>
+##		Where <infile> is a list of table files, each the output of hmmsearch
+##		with the --tblout option specified
+##
 ## For parsing hmmsearch output. Dumps a pickled object of the following format:
 ## {species1:
 ##		{hit1:	# where hit is fasta ID
@@ -13,12 +17,12 @@ from pprint import pprint as pp
 ##	 species 2 ...etc.
 ##	}
 ##
-## Might be nice to include information on which file the output came from
 
 def parse(infile, cutoff):
 	'''From hmmesearch output file, return dictionary of hits better than 
 	cutoff mapped to e-values and number of predicted domains, as a tuple.'''
 	D = {}
+	sys.stderr.write("Parsing %s" % infile)
 	with open(infile) as f:
 		for line in f:
 			if not line.startswith('#'):
@@ -44,10 +48,14 @@ def hits_D_from_files(file_list, cutoff):
 		species = f.split('_')[0] # Generate species name from infile name
 		D[species] = hits_D
 	return D
+	
+	## Summary Functions ##	
 
-### Summary function.
-
+# Should maybe deprecate this one?
 def filtered_keys(key_list):
+	'''Given a list of hit ids, filter repeat transcripts from Origins of 
+	Multicellularity database and return a list of non-redundant ids, and
+	redundant ids.'''
 	expr = re.compile("T\d")
 	nonredlist, redlist, genes = [], [], []
 	try:

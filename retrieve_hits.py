@@ -24,7 +24,8 @@ def path_to_file(name,walk):
 		for f in filenames:
 			if f.startswith(name) and not f.endswith(".txt"):
 				pathlist.append(os.path.join(dirpath,f))
-	assert len(pathlist) < 2, "Found more than one file matching name"
+				assert len(pathlist) < 2,\
+				"Found more than one file matching name: %s" % name
 	assert len(pathlist) > 0, "Didn't find any files matching '%s'" % name
 	sys.stderr.write("Retrieving from %s\n" % pathlist[0])
 	return pathlist
