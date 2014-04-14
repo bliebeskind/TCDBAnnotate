@@ -22,7 +22,7 @@ def parse(infile, cutoff):
 	'''From hmmesearch output file, return dictionary of hits better than 
 	cutoff mapped to e-values and number of predicted domains, as a tuple.'''
 	D = {}
-	sys.stderr.write("Parsing %s" % infile)
+	sys.stderr.write("Parsing %s\n" % infile)
 	with open(infile) as f:
 		for line in f:
 			if not line.startswith('#'):
@@ -93,7 +93,10 @@ def print_summary(D):
 		numHits = len(species_hits)
 		domain_list = [species[k][1] for k in species_hits]
 		evalue_list = [float(species[k][0]) for k in species_hits]
-		print "    Average e-value: %e" % (sum(evalue_list)/len(evalue_list))
+		try:
+			print "    Average e-value: %e" % (sum(evalue_list)/len(evalue_list))
+		except ZeroDivisionError:
+			print "    Average e-value: 0"
 		num_domains(domain_list)
 		print ''
 	print "** Origins of Multicellularity genes with multiple transcripts **"
