@@ -14,6 +14,9 @@ import csv
 ## Another idea for later is to have a field that holds counts of each
 ## type of gene for each species for later use with ancestral gene count
 ## reconstruction programs that use this information instead of trees.
+##
+## Also would be nice to be able to run blast_annotation from within
+## this class
 
 tcdb_id_map = {"1.A.1.1": "KcsA",
 		"1.A.1.2": "Kv",
@@ -67,6 +70,14 @@ tcdb_id_map = {"1.A.1.1": "KcsA",
 		"1.A.1.27": "Kputative1",
 		"1.A.1.28": "Kputative2",
 		"1.A.1.29": "Kputative3",
+		"1.A.3.": "RyR",
+		"1.A.4.": "TRP", # Transient Receptor Potential
+		"1.A.5.": "PCC", # Polycystin Cation Channel
+		"1.A.6.": "ENaC", # Epithelial Sodium Channel
+		"1.A.7.": "P2X", # ATP-gated P2X receptor
+		"1.A.9.": "LIC", # Ligand-gated Ion Channel (Cys-loop)
+		"1.A.10.": "GIC", # Glutamate-gated Ion Channel
+		"2.A.49.": "ClC" # Chloride Carrier/Channel
 		}
 
 class TCDBAnnotate:
@@ -132,6 +143,14 @@ class TCDBAnnotate:
 			return True
 		else:
 			return False
+	
+	def _is_vic(self,tcdb_id):
+		'''Check if tcdb_id belongs to the Cav group, which unfortunately
+		includes NALCN, TPCs, and others.'''
+		if "1.A.1." in tcdb_id:
+			return True
+		else:
+			return False
 		
 	def _gene_generator(self,infile,gene_list):
 		'''Generator function for parsing tsv annotation file.
@@ -145,8 +164,10 @@ class TCDBAnnotate:
 				tcdb_id = line[2]
 				if self._is_cav(tcdb_id):
 					pass
-				else:
+				elif self._is_vic(tcdb_id):
 					tcdb_id = ".".join(tcdb_id.split(".")[:4])
+				else:
+					tcdb_id = ".".join(tcdb_id.split(".")[:3]) + "."
 				try:
 					if self.schema[tcdb_id] in gene_list:
 						yield "\t".join(line), self.schema[tcdb_id]

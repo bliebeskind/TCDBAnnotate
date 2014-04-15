@@ -17,7 +17,7 @@ def clean(infile,format='fasta'):
 	'''
 	records = SeqIO.parse(infile,format)
 	for rec in records:
-		if rec.id.starswith("jgi"):
+		if rec.id.startswith("jgi"):
 			split = rec.id.split("|")
 			rec.id = split[1] + split[2]
 			rec.description = ''
