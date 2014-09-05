@@ -77,6 +77,7 @@ tcdb_id_map = {"1.A.1.1": "KcsA",
 		"1.A.7.": "P2X", # ATP-gated P2X receptor
 		"1.A.9.": "LIC", # Ligand-gated Ion Channel (Cys-loop)
 		"1.A.10.": "GIC", # Glutamate-gated Ion Channel
+		"1.A.17.": "Ano", # Anoctamin
 		"2.A.49.": "ClC" # Chloride Carrier/Channel
 		}
 

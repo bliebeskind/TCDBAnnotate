@@ -25,7 +25,7 @@ def make_gene_D(gene_list):
 				gene_D.update(get_genes(f,d))
 				family_count +=1
 		except IOError:
-			sys.stderr.write("No file called %s\n" % d)	
+			sys.stderr.write("No file called %s\n" % d)	# misleading
 	print "Found %i gene families" % family_count
 	return gene_D
 	

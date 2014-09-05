@@ -20,7 +20,7 @@ from Bio.Blast import NCBIXML
 # gnl|BL_ORD_ID|125 gnl|TC-DB|Q9HCF6 1.A.4.5.6 Transient receptor potential cation channel subfamily M member 3 OS=Homo sapiens GN=TRPM3 PE=2 SV=4
 
 def hit_generator(INFILE, EVALUE_THRESH):
-	''''''
+	'''Generator function yielding tuple of query name and name of top hit.'''
 	with open(INFILE) as f:
 		blast_records = NCBIXML.parse(f)
 		for record in blast_records:
@@ -28,7 +28,7 @@ def hit_generator(INFILE, EVALUE_THRESH):
 				tophit = record.descriptions[0]
 			except IndexError: # no hits?
 				continue
-			if float(tophit.e) < EVALUE_THRESH:
+			if float(tophit.e) < float(EVALUE_THRESH):
 				yield record.query, tophit.title
 			else:
 				continue
